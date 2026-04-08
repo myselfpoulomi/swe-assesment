@@ -62,6 +62,15 @@ export function WallCalendar() {
   const heroSrc =
     HERO_BACKGROUNDS[(cursor.y * 12 + cursor.m) % HERO_BACKGROUNDS.length]
 
+  const chevronHeroClass =
+    heroSrc === '/back1.png'
+      ? ' wall-calendar__chevron--back1'
+      : heroSrc === '/back2.png'
+        ? ' wall-calendar__chevron--back2'
+        : heroSrc === '/back3.png'
+          ? ' wall-calendar__chevron--back3'
+          : ''
+
   const cells = useMemo(
     () => getCalendarCells(cursor.y, cursor.m),
     [cursor.y, cursor.m],
@@ -145,9 +154,7 @@ export function WallCalendar() {
             <AnimatePresence initial={false} mode="sync">
               <motion.div
                 key={heroSrc}
-                className={`wall-calendar__chevron${
-                  heroSrc === '/back1.png' ? ' wall-calendar__chevron--back1' : ''
-                }`}
+                className={`wall-calendar__chevron${chevronHeroClass}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

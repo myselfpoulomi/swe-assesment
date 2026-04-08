@@ -85,6 +85,26 @@
   box-shadow: 0 4px 0 rgba(28, 47, 36, 0.22);
 }
 
+.wall-calendar__chevron--back2 {
+  background: linear-gradient(
+    to right,
+    #d7d7e1,
+    #fdccac,
+    #6f8186
+  );
+  box-shadow: 0 4px 0 rgba(111, 129, 134, 0.2);
+}
+
+.wall-calendar__chevron--back3 {
+  background: linear-gradient(
+    to right,
+    #fde8df,
+    #ce7380,
+    #d35240
+  );
+  box-shadow: 0 4px 0 rgba(211, 82, 64, 0.2);
+}
+
 .wall-calendar__masthead {
   position: relative;
   z-index: 1;
