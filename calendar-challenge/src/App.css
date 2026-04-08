@@ -494,3 +494,14 @@
     background: rgba(77, 182, 172, 0.2);
   }
 }
+
+/* Month nav slide: clip overflow only (does not alter existing calendar rules) */
+.wall-calendar__calendar-slide-clip {
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+}
+
+.wall-calendar__calendar-slide-page {
+  width: 100%;
+}

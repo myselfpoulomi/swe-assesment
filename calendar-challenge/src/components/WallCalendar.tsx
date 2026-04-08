@@ -1,4 +1,6 @@
-import { useCallback, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import type { MutableRefObject } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   compareDateKeys,
   getCalendarCells,
@@ -8,6 +10,22 @@ import {
 import { usePersistedNotes } from '../hooks/usePersistedNotes'
 
 const WEEKDAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+
+const CALENDAR_SLIDE_TRANSITION = {
+  x: { type: 'tween' as const, duration: 0.42, ease: [0.22, 1, 0.36, 1] as const },
+}
+
+function buildCalendarSlideVariants(navDirRef: MutableRefObject<number>) {
+  return {
+    enter: () => ({
+      x: navDirRef.current >= 0 ? '100%' : '-100%',
+    }),
+    center: { x: 0 },
+    exit: () => ({
+      x: navDirRef.current >= 0 ? '-100%' : '100%',
+    }),
+  }
+}
 
 function isWeekend(d: Date): boolean {
   const day = d.getDay()
@@ -23,6 +41,11 @@ export function WallCalendar() {
   const [rangeStart, setRangeStart] = useState<string | null>(null)
   const [rangeEnd, setRangeEnd] = useState<string | null>(null)
   const [showMonthMemoField, setShowMonthMemoField] = useState(false)
+  const calendarNavDirRef = useRef(0)
+  const calendarSlideVariants = useMemo(
+    () => buildCalendarSlideVariants(calendarNavDirRef),
+    [],
+  )
 
   const { monthMemos, setMonthMemo } = usePersistedNotes()
 
@@ -65,6 +88,7 @@ export function WallCalendar() {
   )
 
   const prevMonth = () => {
+    calendarNavDirRef.current = -1
     setCursor((c) => {
       const d = new Date(c.y, c.m - 1, 1)
       return { y: d.getFullYear(), m: d.getMonth() }
@@ -72,6 +96,7 @@ export function WallCalendar() {
   }
 
   const nextMonth = () => {
+    calendarNavDirRef.current = 1
     setCursor((c) => {
       const d = new Date(c.y, c.m + 1, 1)
       return { y: d.getFullYear(), m: d.getMonth() }
@@ -145,88 +170,103 @@ export function WallCalendar() {
           </aside>
 
           <div className="wall-calendar__calendar-col">
-            <div className="wall-calendar__calendar-head">
-              <div className="wall-calendar__nav">
-                <button
-                  type="button"
-                  className="wall-calendar__nav-btn"
-                  onClick={prevMonth}
-                  aria-label="Previous month"
+            <div className="wall-calendar__calendar-slide-clip">
+              <AnimatePresence initial={false} mode="wait">
+                <motion.div
+                  key={mk}
+                  className="wall-calendar__calendar-slide-page"
+                  role="presentation"
+                  variants={calendarSlideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={CALENDAR_SLIDE_TRANSITION}
                 >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  className="wall-calendar__nav-btn"
-                  onClick={nextMonth}
-                  aria-label="Next month"
-                >
-                  ›
-                </button>
-              </div>
-            </div>
+                  <div className="wall-calendar__calendar-head">
+                    <div className="wall-calendar__nav">
+                      <button
+                        type="button"
+                        className="wall-calendar__nav-btn"
+                        onClick={prevMonth}
+                        aria-label="Previous month"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        className="wall-calendar__nav-btn"
+                        onClick={nextMonth}
+                        aria-label="Next month"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </div>
 
-            <div className="wall-calendar__weekdays">
-              {WEEKDAYS.map((d, i) => (
-                <div
-                  key={d}
-                  className={`wall-calendar__weekday${
-                    i >= 5 ? ' wall-calendar__weekday--weekend' : ''
-                  }`}
-                >
-                  {d}
-                </div>
-              ))}
-            </div>
+                  <div className="wall-calendar__weekdays">
+                    {WEEKDAYS.map((d, i) => (
+                      <div
+                        key={d}
+                        className={`wall-calendar__weekday${
+                          i >= 5 ? ' wall-calendar__weekday--weekend' : ''
+                        }`}
+                      >
+                        {d}
+                      </div>
+                    ))}
+                  </div>
 
-            <div className="wall-calendar__cells">
-              {cells.map((cell) => {
-                const key = toDateKey(cell.date)
-                const inRange = isInRange(key)
-                const isStart = rangeStart === key
-                const isEnd = rangeEnd === key
-                const isToday = key === todayKey
-                const weekend = isWeekend(cell.date)
+                  <div className="wall-calendar__cells">
+                    {cells.map((cell) => {
+                      const key = toDateKey(cell.date)
+                      const inRange = isInRange(key)
+                      const isStart = rangeStart === key
+                      const isEnd = rangeEnd === key
+                      const isToday = key === todayKey
+                      const weekend = isWeekend(cell.date)
 
-                let cellMod = ''
-                if (!cell.inMonth) cellMod = ' wall-calendar__day--muted'
-                else if (weekend) cellMod = ' wall-calendar__day--weekend'
-                if (inRange) cellMod += ' wall-calendar__day--in-range'
-                if (isStart) cellMod += ' wall-calendar__day--start'
-                if (isEnd) cellMod += ' wall-calendar__day--end'
-                if (isToday) cellMod += ' wall-calendar__day--today'
+                      let cellMod = ''
+                      if (!cell.inMonth) cellMod = ' wall-calendar__day--muted'
+                      else if (weekend) cellMod = ' wall-calendar__day--weekend'
+                      if (inRange) cellMod += ' wall-calendar__day--in-range'
+                      if (isStart) cellMod += ' wall-calendar__day--start'
+                      if (isEnd) cellMod += ' wall-calendar__day--end'
+                      if (isToday) cellMod += ' wall-calendar__day--today'
 
-                return (
-                  <button
-                    key={`${key}-${cell.inMonth}`}
-                    type="button"
-                    className={`wall-calendar__day${cellMod}`}
-                    onClick={() => onDayClick(key)}
-                    aria-label={`${key}${isToday ? ', today' : ''}${
-                      isStart ? ', range start' : ''
-                    }${isEnd ? ', range end' : ''}`}
-                  >
-                    <span className="wall-calendar__day-num">
-                      {cell.date.getDate()}
+                      return (
+                        <button
+                          key={`${key}-${cell.inMonth}`}
+                          type="button"
+                          className={`wall-calendar__day${cellMod}`}
+                          onClick={() => onDayClick(key)}
+                          aria-label={`${key}${isToday ? ', today' : ''}${
+                            isStart ? ', range start' : ''
+                          }${isEnd ? ', range end' : ''}`}
+                        >
+                          <span className="wall-calendar__day-num">
+                            {cell.date.getDate()}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <div className="wall-calendar__legend">
+                    <span>
+                      <span className="wall-calendar__swatch wall-calendar__swatch--start" />
+                      Start
                     </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="wall-calendar__legend">
-              <span>
-                <span className="wall-calendar__swatch wall-calendar__swatch--start" />
-                Start
-              </span>
-              <span>
-                <span className="wall-calendar__swatch wall-calendar__swatch--range" />
-                Between
-              </span>
-              <span>
-                <span className="wall-calendar__swatch wall-calendar__swatch--end" />
-                End
-              </span>
+                    <span>
+                      <span className="wall-calendar__swatch wall-calendar__swatch--range" />
+                      Between
+                    </span>
+                    <span>
+                      <span className="wall-calendar__swatch wall-calendar__swatch--end" />
+                      End
+                    </span>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
