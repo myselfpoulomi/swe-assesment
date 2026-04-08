@@ -11,6 +11,13 @@ import { usePersistedNotes } from '../hooks/usePersistedNotes'
 
 const WEEKDAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
+const HERO_BACKGROUNDS = [ '/back1.png', '/back2.png', '/back3.png','/back.png'] as const
+
+const HERO_FADE_TRANSITION = {
+  duration: 1.2,
+  ease: [0.4, 0, 0.2, 1] as const,
+}
+
 const CALENDAR_SLIDE_TRANSITION = {
   x: { type: 'tween' as const, duration: 0.42, ease: [0.22, 1, 0.36, 1] as const },
 }
@@ -51,6 +58,9 @@ export function WallCalendar() {
 
   const mk = monthKey(cursor.y, cursor.m)
   const monthMemo = monthMemos[mk] ?? ''
+
+  const heroSrc =
+    HERO_BACKGROUNDS[(cursor.y * 12 + cursor.m) % HERO_BACKGROUNDS.length]
 
   const cells = useMemo(
     () => getCalendarCells(cursor.y, cursor.m),
@@ -117,12 +127,19 @@ export function WallCalendar() {
       <div className="wall-calendar__sheet">
         <div className="wall-calendar__hero-block">
           <div className="wall-calendar__hero-photo">
-            <img
-              src="/back.png"
-              alt=""
-              className="wall-calendar__hero-img"
-              loading="lazy"
-            />
+            <AnimatePresence initial={false} mode="sync">
+              <motion.img
+                key={heroSrc}
+                src={heroSrc}
+                alt=""
+                className="wall-calendar__hero-img"
+                loading="lazy"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={HERO_FADE_TRANSITION}
+              />
+            </AnimatePresence>
           </div>
           <div className="wall-calendar__chevron-wrap" aria-hidden>
             <div className="wall-calendar__chevron" />

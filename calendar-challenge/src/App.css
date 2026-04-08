@@ -40,15 +40,16 @@
 .wall-calendar__hero-photo {
   position: relative;
   overflow: hidden;
+  height: clamp(200px, 38vw, 320px);
   min-height: clamp(200px, 38vw, 320px);
 }
 
-
-
 .wall-calendar__hero-img {
   display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: clamp(200px, 38vw, 320px);
+  height: 100%;
   object-fit: cover;
   object-position: center 35%;
 }
