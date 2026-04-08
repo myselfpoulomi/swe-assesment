@@ -29,14 +29,7 @@
   min-height: clamp(200px, 38vw, 320px);
 }
 
-.wall-calendar__hero-photo::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 1;
-}
+
 
 .wall-calendar__hero-img {
   display: block;
