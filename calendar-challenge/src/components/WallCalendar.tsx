@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import heroImg from '../assets/hero-wall.png'
 import {
   compareDateKeys,
   getCalendarCells,
@@ -25,8 +24,7 @@ export function WallCalendar() {
   const [rangeEnd, setRangeEnd] = useState<string | null>(null)
   const [showMonthMemoField, setShowMonthMemoField] = useState(false)
 
-  const { monthMemos, setMonthMemo, setRangeMemo, getRangeMemo } =
-    usePersistedNotes()
+  const { monthMemos, setMonthMemo } = usePersistedNotes()
 
   const mk = monthKey(cursor.y, cursor.m)
   const monthMemo = monthMemos[mk] ?? ''
@@ -54,14 +52,6 @@ export function WallCalendar() {
     },
     [rangeStart, rangeEnd],
   )
-
-  const clearSelection = useCallback(() => {
-    setRangeStart(null)
-    setRangeEnd(null)
-  }, [])
-
-  const selectionMemo =
-    rangeStart && rangeEnd ? getRangeMemo(rangeStart, rangeEnd) : ''
 
   const isInRange = useCallback(
     (key: string) => {
@@ -103,7 +93,7 @@ export function WallCalendar() {
         <div className="wall-calendar__hero-block">
           <div className="wall-calendar__hero-photo">
             <img
-              src={heroImg}
+              src="/back.png"
               alt=""
               className="wall-calendar__hero-img"
               loading="lazy"
@@ -143,52 +133,13 @@ export function WallCalendar() {
                     <textarea
                       id="month-memo"
                       className="wall-calendar__notepad-field wall-calendar__notepad-field--primary"
-                      rows={5}
+                      rows={8}
                       value={monthMemo}
                       onChange={(e) => setMonthMemo(mk, e.target.value)}
                       spellCheck
                     />
                   </>
                 ) : null}
-
-                <div className="wall-calendar__range-notes">
-                  <div className="wall-calendar__range-bar">
-                    <span className="wall-calendar__range-label">
-                      {rangeStart && rangeEnd
-                        ? `${rangeStart} — ${rangeEnd}`
-                        : 'Select start and end dates'}
-                    </span>
-                    {rangeStart && rangeEnd ? (
-                      <button
-                        type="button"
-                        className="wall-calendar__clear"
-                        onClick={clearSelection}
-                      >
-                        Clear
-                      </button>
-                    ) : null}
-                  </div>
-                  {rangeStart && rangeEnd ? (
-                    <>
-                      <label
-                        className="wall-calendar__sr-only"
-                        htmlFor="range-memo"
-                      >
-                        Notes for selected range
-                      </label>
-                      <textarea
-                        id="range-memo"
-                        className="wall-calendar__notepad-field"
-                        rows={3}
-                        value={selectionMemo}
-                        onChange={(e) =>
-                          setRangeMemo(rangeStart, rangeEnd, e.target.value)
-                        }
-                        spellCheck
-                      />
-                    </>
-                  ) : null}
-                </div>
               </div>
             </div>
           </aside>
