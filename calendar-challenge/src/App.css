@@ -1,15 +1,28 @@
 .app {
   min-height: 100svh;
-  padding: clamp(1rem, 4vw, 2rem);
+  min-height: 100dvh;
+  padding-top: max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-top, 0px));
+  padding-right: max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-right, 0px));
+  padding-bottom: max(
+    clamp(1rem, 4vw, 2rem),
+    env(safe-area-inset-bottom, 0px)
+  );
+  padding-left: max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-left, 0px));
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
 }
 
 .wall-calendar {
-  max-width: 920px;
+  width: 100%;
+  max-width: min(920px, 100%);
   margin: 0 auto;
 }
 
 .wall-calendar__sheet {
+  width: 100%;
+  max-width: 100%;
   background: #ffffff;
   border-radius: 0.75rem;
   border: 1px solid var(--color-border, #e5e7eb);
@@ -200,6 +213,8 @@
   line-height: 1;
   cursor: pointer;
   color: var(--color-text, #1f2937);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background 0.12s ease,
     border-color 0.12s ease,
@@ -226,10 +241,13 @@
 
 .wall-calendar__weekday {
   text-align: center;
-  font-size: 0.68rem;
+  font-size: clamp(0.62rem, 2.4vw, 0.72rem);
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   color: var(--color-text, #1f2937);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .wall-calendar__weekday--weekend {
@@ -246,6 +264,7 @@
   position: relative;
   border: none;
   min-height: 40px;
+  min-width: 0;
   padding: 0;
   background: transparent;
   cursor: pointer;
@@ -253,6 +272,8 @@
   font-weight: 600;
   color: var(--color-text, #1f2937);
   border-radius: 2px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background 0.12s ease,
     color 0.12s ease,
@@ -351,18 +372,24 @@
 @media (max-width: 720px) {
   .wall-calendar__body {
     grid-template-columns: 1fr;
+    gap: clamp(1rem, 4vw, 1.5rem);
+    padding: clamp(1rem, 3vw, 1.5rem) clamp(0.75rem, 3vw, 1.25rem)
+      clamp(1.25rem, 3vw, 1.75rem);
   }
 
   .wall-calendar__calendar-col {
     order: 1;
+    min-width: 0;
   }
 
   .wall-calendar__notes-col {
     order: 2;
+    min-width: 0;
   }
 
   .wall-calendar__chevron-wrap {
-    margin-top: -2.5rem;
+    /* Less overlap with hero so the band sits lower on small screens */
+    margin-top: -0.75rem;
     min-height: 4rem;
   }
 
@@ -371,6 +398,99 @@
   }
 
   .wall-calendar__masthead {
-    padding-right: 1rem;
+    padding: 0.35rem max(0.75rem, env(safe-area-inset-right, 0px)) 0.5rem
+      max(0.75rem, env(safe-area-inset-left, 0px));
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .wall-calendar__hero-photo {
+    min-height: clamp(160px, 42vw, 280px);
+  }
+
+  .wall-calendar__hero-img {
+    height: clamp(160px, 42vw, 280px);
+  }
+
+  .wall-calendar__calendar-head {
+    margin-bottom: 10px;
+  }
+
+  .wall-calendar__nav-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+
+  .wall-calendar__day {
+    min-height: 44px;
+    font-size: clamp(0.82rem, 3.2vw, 0.9rem);
+  }
+
+  .wall-calendar__notepad {
+    min-height: 220px;
+  }
+
+  .wall-calendar__notepad-inner {
+    min-height: 218px;
+  }
+
+  .wall-calendar__notepad-field--primary {
+    min-height: 160px;
+    /* Avoid iOS zoom on focus */
+    font-size: max(1rem, 16px);
+  }
+
+  .wall-calendar__notepad-placeholder {
+    font-size: max(0.92rem, 16px);
+    line-height: 1.75rem;
+  }
+
+  .wall-calendar__notepad-field {
+    line-height: 1.75rem;
+  }
+
+  .wall-calendar__legend {
+    gap: 8px 12px;
+    margin-top: 14px;
+    font-size: max(0.7rem, 12px);
+    justify-content: center;
+    text-align: center;
+  }
+
+  .wall-calendar__sheet {
+    border-radius: clamp(0.5rem, 2.5vw, 0.75rem);
+  }
+}
+
+@media (max-width: 400px) {
+  .wall-calendar__body {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  .wall-calendar__weekdays,
+  .wall-calendar__cells {
+    gap: 1px;
+  }
+
+  .wall-calendar__notes-heading {
+    font-size: 0.9rem;
+  }
+
+  .wall-calendar__masthead-month {
+    font-size: clamp(1.1rem, 5vw, 1.45rem);
+  }
+}
+
+@media (max-width: 720px) and (hover: none) {
+  .wall-calendar__nav-btn:active {
+    border-color: var(--color-primary-hover, #e8b923);
+    background: rgba(244, 196, 48, 0.2);
+    color: var(--color-brown, #3e2c23);
+  }
+
+  .wall-calendar__day:active:not(:disabled) {
+    background: rgba(77, 182, 172, 0.2);
   }
 }
